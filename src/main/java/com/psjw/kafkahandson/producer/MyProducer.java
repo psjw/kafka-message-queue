@@ -1,37 +1,19 @@
 package com.psjw.kafkahandson.producer;
 
 import com.psjw.kafkahandson.model.MyMessage;
-import java.util.function.Supplier;
-import org.springframework.cloud.stream.function.StreamBridge;
-import org.springframework.kafka.support.KafkaHeaders;
-import org.springframework.messaging.Message;
-import org.springframework.messaging.support.MessageBuilder;
+import lombok.RequiredArgsConstructor;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Sinks;
-import reactor.core.publisher.Sinks.EmitFailureHandler;
 
 
 @Component
-public class MyProducer implements Supplier<Flux<Message<MyMessage>>> {
+@RequiredArgsConstructor
+public class MyProducer {
 
-    public MyProducer() {
-        System.out.println("MyProducer init!");
+    private final KafkaTemplate<String, MyMessage> kafkaTemplate;
+
+    public void sendMessage(MyMessage myMessage) {
+        kafkaTemplate.send("my-json-topic", String.valueOf(myMessage.getAge()), myMessage);
     }
 
-    private final Sinks.Many<Message<MyMessage>> sinks = Sinks.many().multicast()
-            .onBackpressureBuffer();
-
-    public void sendMessage(MyMessage myMessage){
-//        StreamBridge => 토픽메시지 지정가능(다른방법)
-        Message<MyMessage> message = MessageBuilder.withPayload(myMessage)
-                .setHeader(KafkaHeaders.KEY, String.valueOf(myMessage.getAge()))
-                .build();
-        sinks.emitNext(message, EmitFailureHandler.FAIL_FAST);
-    }
-
-    @Override
-    public Flux<Message<MyMessage>> get() {
-        return sinks.asFlux();
-    }
 }

@@ -1,19 +1,19 @@
 package com.psjw.kafkahandson.consumer;
 
 import com.psjw.kafkahandson.model.MyMessage;
-import java.util.function.Consumer;
-import org.springframework.messaging.Message;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 @Component
-public class MyConsumer implements Consumer<Message<MyMessage>> {
+public class MyConsumer {
 
-    public MyConsumer() {
-        System.out.println("MyConsumer init!");
-    }
 
-    @Override
-    public void accept(Message<MyMessage> message) {
-        System.out.println("Message arrived! - "+ message.getPayload());
+    @KafkaListener(
+            topics = {"my-json-topic"},
+            groupId = "test-consumer-group"
+    )
+    public void accept(ConsumerRecord<String, MyMessage> message) {
+        System.out.println("Message arrived! - " + message.value());
     }
 }
