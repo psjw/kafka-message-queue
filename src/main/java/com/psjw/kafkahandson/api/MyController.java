@@ -1,5 +1,6 @@
 package com.psjw.kafkahandson.api;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.psjw.kafkahandson.model.MyMessage;
 import com.psjw.kafkahandson.producer.MyProducer;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,11 @@ public class MyController {
     void message(
             @RequestBody MyMessage message
     ){
-        myProducer.sendMessage(message);
+        try {
+            myProducer.sendMessage(message);
+        } catch (JsonProcessingException e) {
+            e.fillInStackTrace();
+        }
     }
 
 }

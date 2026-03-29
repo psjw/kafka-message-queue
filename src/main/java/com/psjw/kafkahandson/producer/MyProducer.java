@@ -14,18 +14,14 @@ import java.util.Objects;
 @Component
 @RequiredArgsConstructor
 public class MyProducer {
-
+    ObjectMapper objectMapper = new ObjectMapper();
     private final KafkaTemplate<String, String> kafkaTemplate;
 
-    public void sendMessage(MyMessage myMessage)  {
-        ObjectMapper objectMapper = new ObjectMapper();
-        String message = null;
-        try {
-            message = objectMapper.writeValueAsString(myMessage);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-        kafkaTemplate.send(Topic.MY_JSON_TOPIC, String.valueOf(myMessage.getAge()), message);
+    public void sendMessage(MyMessage myMessage) throws JsonProcessingException {
+        kafkaTemplate.send(
+                Topic.MY_JSON_TOPIC,
+                String.valueOf(myMessage.getAge()),
+                objectMapper.writeValueAsString(myMessage));
     }
 
 }
